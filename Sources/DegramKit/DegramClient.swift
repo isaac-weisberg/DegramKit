@@ -17,14 +17,18 @@ public class DegramClient {
 
     internal func work(_ items: Any?..., separator: String, terminator: String, converter: (Any?) -> String, _ callback: ((Bool) -> Void)? = nil) {
         guard items.count > 0 else {
+            callback?(false)
             return
         }
         let payload = convert(items, separator: separator, terminator: terminator, converter: converter)
+        post(message: payload)
     }
 
     internal func convert(_ items: Any?..., separator: String, terminator: String, converter: (Any?) -> String) -> String {
-        return ""
+        return "\(items.map(converter).joined(separator: separator))\(terminator)"
     }
+
+    
 
     internal func post(message: String, _ callback: ((Bool) -> Void)? = nil) {
 
