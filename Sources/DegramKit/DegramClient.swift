@@ -43,6 +43,16 @@ public final class DegramClient {
             callback?(false)
             return
         }
-
+        session.dataTask(with: request) { data, response, error in 
+            if error != nil {
+                callback?(false)
+                return
+            }
+            if let resp = response as? HTTPURLResponse {
+                callback?(resp.statusCode == 200)
+                return
+            }
+            callback?(false)
+        }.resume()
     }
 }
