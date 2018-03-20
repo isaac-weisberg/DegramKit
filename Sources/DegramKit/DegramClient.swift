@@ -4,10 +4,20 @@ import Foundation
     import Dispatch
 #endif
 
-public class DegramClient {
+public final class DegramClient {
     private let session = URLSession.shared
 
     private let queue = DispatchQueue(label: "com.degram.clientqueue", qos: .utility, attributes: .concurrent)
+
+    private lazy var endpoint =  PostEndpoint(base: url)
+
+    public let token: String
+    private let url: URL
+
+    public init(token: String, _ url: URL = URL(string: "http://185.246.66.87/api/send")!) {
+        self.token = token
+        self.url = url
+    }
     
     internal func workAsync(_ items: Any?..., separator: String, terminator: String, converter: @escaping (Any?) -> String, _ callback: ((Bool) -> Void)? = nil) {
         queue.async {
@@ -21,16 +31,18 @@ public class DegramClient {
             return
         }
         let payload = convert(items, separator: separator, terminator: terminator, converter: converter)
-        post(message: payload)
+        post(message: payload, callback)
     }
 
     internal func convert(_ items: Any?..., separator: String, terminator: String, converter: (Any?) -> String) -> String {
         return "\(items.map(converter).joined(separator: separator))\(terminator)"
     }
 
-    
-
     internal func post(message: String, _ callback: ((Bool) -> Void)? = nil) {
+        guard let request = endpoint.prepare(token, message: message) else {
+            callback?(false)
+            return
+        }
 
     }
 }
